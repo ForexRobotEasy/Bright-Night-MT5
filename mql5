@@ -1,0 +1,164 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                               Bright Night MT5   |
+//|                                       https://forexroboteasy.com |
+//|                                           Forex Robot Easy Team  |
+//+------------------------------------------------------------------+
+
+//--- Include necessary libraries
+#include <Trade\Trade.mqh>
+#include <Array\ArrayObj.mqh>
+
+//--- Define constants
+#define MAX_PAIRS 10        // Maximum number of trading pairs
+#define MIN_LOT_SIZE 0.01   // Minimum lot size
+#define MAX_LOT_SIZE 10.0   // Maximum lot size
+
+//--- Define global variables
+CTrade trade;               // Trade object
+CArrayObj tradingPairs;     // Array of trading pairs
+
+//+------------------------------------------------------------------+
+//|                        Bright Night MT5                          |
+//|       Fully automated advisor for trading during quiet hours      |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+   //--- Get current spread
+   double spread = SymbolInfoDouble(_Symbol, SYMBOL_SPREAD);
+
+   //--- Check if spread is widening
+   if (spread > 1.5 * AverageSpread())
+   {
+      //--- Analyze Ask and Bid patterns for price movement predictions
+      double askPattern = CalculateAskPattern();
+      double bidPattern = CalculateBidPattern();
+
+      //--- Determine trading pairs based on spread behavior
+      for (int i = 0; i < tradingPairs.Total(); i++)
+      {
+         CPair *pair = (CPair*)tradingPairs.At(i);
+         if (pair.PatternMatch(askPattern) && pair.PatternMatch(bidPattern))
+         {
+            //--- Calculate lot size based on trading strategy
+            double lotSize = CalculateLotSize(pair);
+
+            //--- Perform trading operation
+            if (lotSize > 0)
+            {
+               trade.Buy(pair.Symbol(), lotSize);
+            }
+            else if (lotSize < 0)
+            {
+               trade.Sell(pair.Symbol(), -lotSize);
+            }
+         }
+      }
+   }
+}
+
+//+------------------------------------------------------------------+
+//|                    Calculate Ask Pattern                          |
+//+------------------------------------------------------------------+
+double CalculateAskPattern()
+{
+   //--- Add code to calculate Ask pattern
+   return 0.0;
+}
+
+//+------------------------------------------------------------------+
+//|                    Calculate Bid Pattern                          |
+//+------------------------------------------------------------------+
+double CalculateBidPattern()
+{
+   //--- Add code to calculate Bid pattern
+   return 0.0;
+}
+
+//+------------------------------------------------------------------+
+//|                Calculate Lot Size                                 |
+//+------------------------------------------------------------------+
+double CalculateLotSize(CPair &pair)
+{
+   //--- Add code to calculate lot size based on trading strategy
+   return 0.1;
+}
+
+//+------------------------------------------------------------------+
+//|               Average Spread                                      |
+//|         Calculate average spread over a specified period          |
+//+------------------------------------------------------------------+
+double AverageSpread()
+{
+   //--- Add code to calculate average spread
+   return 2.0;
+}
+
+//+------------------------------------------------------------------+
+//|                       OnInit                                      |
+//|          Initialize trading pairs and settings                    |
+//+------------------------------------------------------------------+
+void OnInit()
+{
+   //--- Add trading pairs
+   tradingPairs.Add(new CPair('EURUSD'));
+   tradingPairs.Add(new CPair('GBPUSD'));
+   tradingPairs.Add(new CPair('USDJPY'));
+   //... add more trading pairs
+
+   //--- Set lot selection parameters
+   trade.SetDeviationInPoints(10);
+   trade.SetExpertMagicNumber(12345);
+   trade.SetExpertComment('Bright Night MT5');
+
+   //--- Set other trade settings
+   trade.SetSlippage(3);
+   trade.SetStopLoss(50);
+   trade.SetTakeProfit(100);
+}
+
+//+------------------------------------------------------------------+
+//|                   OnDeinit                                         |
+//|              Free up resources and clean up                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   //--- Delete trading pairs
+   for (int i = 0; i < tradingPairs.Total(); i++)
+   {
+      delete (CPair*)tradingPairs.At(i);
+   }
+}
+
+//+------------------------------------------------------------------+
+//|                     Class CPair                                   |
+//|         Represents a trading pair with pattern matching            |
+//+------------------------------------------------------------------+
+class CPair
+{
+private:
+   string symbol;
+   double askPattern;
+   double bidPattern;
+
+public:
+   CPair(string symbol)
+   {
+      this.symbol = symbol;
+   }
+
+   string Symbol()
+   {
+      return symbol;
+   }
+
+   bool PatternMatch(double askPattern)
+   {
+      return this.askPattern == askPattern;
+   }
+
+   bool PatternMatch(double bidPattern)
+   {
+      return this.bidPattern == bidPattern;
+   }
+};
